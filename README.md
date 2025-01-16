@@ -81,6 +81,59 @@ By default, the script will process all compatible files in the input directory:
 - `--xslt`: Path to XSLT template (default: "bom2grouped_csv_jlpcb.xsl")
 - `--input`: Input CSV file path (default: "input.csv")
 - `--output`: Output CSV file path (default: "output.csv")
+- `--adjust-rotation`: Adjust rotation for specific components (format: "C1:+90,R2:-180")
+- `--adjust-x`: Adjust X coordinates (format: "C1:+1.5,R2:-2.0")
+- `--adjust-y`: Adjust Y coordinates (format: "C1:+1.5,R2:-2.0")
+
+## Component Adjustments
+
+You can adjust the position and rotation of specific components:
+
+```bash
+# Adjust rotation only
+python main.py --adjust-rotation "C1:+90,R2:-180"
+
+# Adjust X and Y coordinates
+python main.py --adjust-x "C1:+1.5" --adjust-y "C1:-2.0"
+
+# Combine multiple adjustments
+python main.py --adjust-rotation "C1:+90" --adjust-x "C1:+1.5,R2:-2.0" --adjust-y "C1:-1.0"
+```
+
+Notes:
+- All adjustments are relative to current values
+- X/Y coordinates use millimeters
+- Rotation uses degrees (0-360)
+- Multiple components can be adjusted at once
+- Adjustments can be combined freely
+
+## Component Rotation Adjustment
+
+You can adjust the rotation of specific components using the `--adjust-rotation` argument.
+
+### Format
+```bash
+--adjust-rotation "component1:angle1,component2:angle2"
+```
+
+Examples:
+```bash
+# Rotate single component C1 by +90 degrees
+python main.py --replace-header --adjust-rotation "C1:+90"
+
+# Rotate multiple components
+python main.py --replace-header --adjust-rotation "C1:+90,R2:-180,U1:+45"
+
+# Process all files and adjust rotations
+python main.py --adjust-rotation "C1:+90,R2:-180"
+```
+
+Notes:
+- Angles can be positive or negative
+- Multiple components should be separated by commas
+- Rotations are relative to current values
+- Final rotation will be normalized to 0-360 range
+- Changes are applied before header replacement
 
 ## File Format
 

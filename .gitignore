@@ -1,4 +1,4 @@
 input
 output
 __pycache__
-*..pyc
+*.pyc
