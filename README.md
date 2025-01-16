@@ -13,7 +13,7 @@ A Python utility for processing KiCad fabrication files. This tool can:
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/kicad-fabrication-generator.git
+git clone https://github.com/koknovem/kicad-fabrication-generator.git
 cd kicad-fabrication-generator
 ```
 
