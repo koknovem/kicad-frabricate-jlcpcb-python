@@ -1,154 +1,110 @@
-# KiCad Fabrication Generator
+# KiCad JLCPCB Position File Generator
 
-A Python utility for processing KiCad fabrication files. This tool can:
-- Convert XML BOM files to CSV using XSLT
-- Replace CSV headers to match JLCPCB format
+A Python utility for processing KiCad position files to match JLCPCB format requirements. This tool:
+- Converts KiCad position CSV files to JLCPCB format
+- Supports batch processing of multiple files
+- Allows position and rotation adjustments for components
 
 ## Requirements
 
 - Python 3.6+
-- xsltproc (for XML conversion)
+- xsltproc (for BOM conversion)
 
-## Installation
+## Quick Start
 
-1. Clone this repository:
+1. Clone the repository:
 ```bash
-git clone https://github.com/koknovem/kicad-fabrication-generator.git
-cd kicad-fabrication-generator
+git clone https://github.com/koknovem/kicad-frabricate-jlcpcb-python.git
+cd kicad-frabricate-jlcpcb-python
 ```
 
-2. Ensure xsltproc is installed:
-```bash
-# On Debian/Ubuntu
-sudo apt-get install xsltproc
+2. Place files:
+   - Position files (.csv) → `input/` directory
+   - BOM files (.xml) → `input/` directory
+   - XSLT template → root directory as `bom2grouped_csv_jlcpcb.xsl`
 
-# On macOS
-brew install libxslt
-```
-
-## Project Structure
-
-```
-./
-├── bom2grouped_csv_jlpcb.xsl    # XSLT template in root directory
-├── input/                       # Place input files here
-├── output/                      # Generated files appear here
-├── main.py
-├── xml_converter.py
-└── csv_header_replacer.py
-```
-
-## Setup
-1. Place the XSLT file (bom2grouped_csv_jlpcb.xsl) in the current directory (same level as main.py)
-2. Place your XML and CSV files in the ./input directory
-3. Generated files will appear in the ./output directory
-
-## Usage
-
-First, place your input files in the `input` folder. The script will automatically create input and output folders if they don't exist.
-
-### Quick Start
-Simply run without arguments to process all files:
+3. Run the converter:
 ```bash
 python main.py
 ```
-This will:
-1. Convert all XML files to CSV
-2. Process all CSV files to replace headers
 
-### Specific Operations
+## File Structure
+```
+./
+├── bom2grouped_csv_jlcpcb.xsl    # XSLT template for BOM conversion
+├── input/                         # Input directory for CSV/XML files
+│   ├── your-board-top-pos.csv    # KiCad position file
+│   └── your-board.xml            # KiCad BOM file
+├── output/                        # Generated JLCPCB-compatible files
+├── main.py                       # Main script
+├── xml_converter.py              # BOM conversion helper
+└── csv_header_replacer.py        # Position file converter
+```
 
-1. Convert XML to CSV only:
+## Usage Examples
+
+### Basic Usage
 ```bash
+# Process all files in input directory
+python main.py
+
+# Only convert position files
+python main.py --replace-header
+
+# Only convert BOM files
 python main.py --convert-xml
 ```
 
-2. Replace CSV Headers only:
+### Component Position Adjustments
 ```bash
-python main.py --replace-header
-```
+# Rotate components
+python main.py --adjust-rotation "J2:-90,J3:-90"
 
-### 3. Batch Processing
-By default, the script will process all compatible files in the input directory:
-- All XML files will be converted to CSV
-- All CSV files will have their headers replaced
+# Move components (X/Y coordinates)
+python main.py --adjust-x "C1:+1.5" --adjust-y "C1:-2.0"
+
+# Combined adjustments
+python main.py --adjust-rotation "J2:-90,J3:-90" --adjust-y "J2:-5.08,J3:-5.05"
+```
 
 ## Arguments
 
-- `--convert-xml`: Enable XML to CSV conversion
-- `--replace-header`: Enable CSV header replacement
-- `--folder`: Folder path containing XML files (default: "./")
-- `--xslt`: Path to XSLT template (default: "bom2grouped_csv_jlpcb.xsl")
-- `--input`: Input CSV file path (default: "input.csv")
-- `--output`: Output CSV file path (default: "output.csv")
-- `--adjust-rotation`: Adjust rotation for specific components (format: "C1:+90,R2:-180")
-- `--adjust-x`: Adjust X coordinates (format: "C1:+1.5,R2:-2.0")
-- `--adjust-y`: Adjust Y coordinates (format: "C1:+1.5,R2:-2.0")
+| Argument | Description | Example |
+|----------|-------------|---------|
+| `--convert-xml` | Convert BOM XML to CSV | `--convert-xml` |
+| `--replace-header` | Convert position files | `--replace-header` |
+| `--adjust-rotation` | Adjust component rotation | `--adjust-rotation "C1:+90,R2:-180"` |
+| `--adjust-x` | Adjust X coordinates | `--adjust-x "C1:+1.5,R2:-2.0"` |
+| `--adjust-y` | Adjust Y coordinates | `--adjust-y "C1:+1.5,R2:-2.0"` |
+| `--folder` | Input folder path | `--folder "./input"` |
+| `--input` | Input file/folder | `--input "input/board.csv"` |
+| `--output` | Output directory | `--output "output"` |
 
-## Component Adjustments
+## File Format Conversion
 
-You can adjust the position and rotation of specific components:
-
-```bash
-# Adjust rotation only
-python main.py --adjust-rotation "C1:+90,R2:-180"
-
-# Adjust X and Y coordinates
-python main.py --adjust-x "C1:+1.5" --adjust-y "C1:-2.0"
-
-# Combine multiple adjustments
-python main.py --adjust-rotation "C1:+90" --adjust-x "C1:+1.5,R2:-2.0" --adjust-y "C1:-1.0"
-```
-
-Notes:
-- All adjustments are relative to current values
-- X/Y coordinates use millimeters
-- Rotation uses degrees (0-360)
-- Multiple components can be adjusted at once
-- Adjustments can be combined freely
-
-## Component Rotation Adjustment
-
-You can adjust the rotation of specific components using the `--adjust-rotation` argument.
-
-### Format
-```bash
---adjust-rotation "component1:angle1,component2:angle2"
-```
-
-Examples:
-```bash
-# Rotate single component C1 by +90 degrees
-python main.py --replace-header --adjust-rotation "C1:+90"
-
-# Rotate multiple components
-python main.py --replace-header --adjust-rotation "C1:+90,R2:-180,U1:+45"
-
-# Process all files and adjust rotations
-python main.py --adjust-rotation "C1:+90,R2:-180"
-```
-
-Notes:
-- Angles can be positive or negative
-- Multiple components should be separated by commas
-- Rotations are relative to current values
-- Final rotation will be normalized to 0-360 range
-- Changes are applied before header replacement
-
-## File Format
-
-### Expected CSV Header Format
-
-Original header:
+### Position File
+Input (KiCad):
 ```
 Ref,Val,Package,PosX,PosY,Rot,Side
 ```
 
-Converted header:
+Output (JLCPCB):
 ```
 Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
 ```
 
+### Notes
+- Rotations are normalized to 0-360 degrees
+- All adjustments are relative to current values
+- Coordinates are in millimeters
+- Layer is mapped from "top/bottom" to "Top/Bottom"
+- Quotes in CSV files are handled automatically
+
 ## License
 
 MIT License
+
+## Links
+- [GitHub Repository](https://github.com/koknovem/kicad-frabricate-jlcpcb-python)
+- [KiCad Website](https://www.kicad.org/)
+- [JLCPCB](https://jlcpcb.com/)
