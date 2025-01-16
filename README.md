@@ -20,13 +20,8 @@ cd kicad-frabricate-jlcpcb-python
 
 2. Place files:
    - Position files (.csv) → `input/` directory
-   - BOM files (.xml) → `input/` directory
+   - KiCad Netlist files (.xml) → `input/` directory (Export from KiCad PCB Editor: File > Fabrication Outputs > Component Placement (.pos))
    - XSLT template → root directory as `bom2grouped_csv_jlcpcb.xsl`
-
-3. Run the converter:
-```bash
-python main.py
-```
 
 ## File Structure
 ```
@@ -34,12 +29,26 @@ python main.py
 ├── bom2grouped_csv_jlcpcb.xsl    # XSLT template for BOM conversion
 ├── input/                         # Input directory for CSV/XML files
 │   ├── your-board-top-pos.csv    # KiCad position file
-│   └── your-board.xml            # KiCad BOM file
+│   └── your-board.xml            # KiCad netlist file in XML format
 ├── output/                        # Generated JLCPCB-compatible files
 ├── main.py                       # Main script
 ├── xml_converter.py              # BOM conversion helper
 └── csv_header_replacer.py        # Position file converter
 ```
+
+## KiCad Export Instructions
+
+1. **Position Files (.csv)**
+   - Open PCB in KiCad PCB Editor
+   - File > Fabrication Outputs > Component Placement (.pos)
+   - Select CSV format
+   - Export to input directory
+
+2. **Netlist Files (.xml)**
+   - Open PCB in KiCad PCB Editor
+   - File > Fabrication Outputs > Generate BOM
+   - Select XML format
+   - Export to input directory
 
 ## Usage Examples
 
